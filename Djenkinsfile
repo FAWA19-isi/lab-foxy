@@ -1,0 +1,26 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('1. Récupération du code') {
+            steps {
+                echo 'Code récupéré depuis GitHub.'
+            }
+        }
+        stage('2. Build de l\'image Docker') {
+            steps {
+                sh 'docker build -t mon-site-web:latest .'
+            }
+        }
+        stage('3. Déploiement du conteneur') {
+            steps {
+                // Arrêter et supprimer l'ancien conteneur s'il existe
+                sh 'docker stop conteneur-web || true'
+                sh 'docker rm conteneur-web || true'
+                
+                // Lancer le nouveau conteneur sur le port 8081
+                sh 'docker run -d --name conteneur-web -p 8081:80 mon-site-web:latest'
+            }
+        }
+    }
+}
